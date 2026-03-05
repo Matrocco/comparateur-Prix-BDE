@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: comparateur_courses
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app  # Permet de modifier ton code sans relancer le build (mode dev)
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: always
