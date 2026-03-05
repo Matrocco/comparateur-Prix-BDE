@@ -1,6 +1,6 @@
 - BDE-Prime : Comparateur de Prix Drive
 
-PanierMalin est un outil de web-scraping moderne permettant de comparer en temps réel les prix d'un produit spécifique sur les enseignes Auchan, Carrefour et Intermarché.
+BDE-Prime est un outil de web-scraping moderne permettant de comparer en temps réel les prix d'un produit spécifique sur les enseignes Auchan, Carrefour et Intermarché.
 
 Le projet utilise FastAPI pour l'interface web et Playwright pour la navigation automatisée (gestion du JavaScript et des prix dynamiques).
 -  Fonctionnalités
@@ -27,7 +27,7 @@ Démarrage rapide
     Cloner le dépôt :
     Bash
 
-    git clone https://github.com/ton-pseudo/panier-malin.git
+    git clone https://github.com/matrocco/panier-malin.git
     cd panier-malin
 
     Lancer l'application avec Docker Compose :
