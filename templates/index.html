@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDE-Prime - Comparateur</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .search-container { margin-top: 50px; margin-bottom: 30px; }
+        .card { border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .price-tag { font-size: 1.2rem; font-weight: bold; color: #198754; }
+        .badge-auchan { background-color: #e1001a; }
+        .badge-carrefour { background-color: #003087; }
+        .badge-inter { background-color: #000000; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row justify-content-center search-container">
+        <div class="col-md-8 text-center">
+            <h1 class="display-5 mb-4">BDE-Prime</h1>
+            <p class="text-muted">Comparez Auchan, Carrefour et Intermarché en un clic.</p>
+            
+            <form action="/chercher" method="post" class="input-group input-group-lg shadow-sm">
+                <input type="text" name="produit" class="form-control" placeholder="Ex: Kinder Bueno, Pâtes, Lait..." required>
+                <button class="btn btn-primary" type="submit">Comparer</button>
+            </form>
+        </div>
+    </div>
+
+    {% if produit_cherche %}
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card p-4">
+                <h3 class="mb-4">Résultats pour : <span class="text-primary">{{ produit_cherche }}</span></h3>
+                
+                {% if resultats %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Enseigne</th>
+                                <th>Produit trouvé</th>
+                                <th class="text-center">Prix</th>
+                                <th class="text-end">Lien</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in resultats %}
+                            <tr>
+                                <td>
+                                    <span class="badge rounded-pill badge-{{ r.enseigne|lower }}">
+                                        {{ r.enseigne }}
+                                    </span>
+                                </td>
+                                <td>{{ r.nom }}</td>
+                                <td class="text-center price-tag">{{ r.prix }}</td>
+                                <td class="text-end">
+                                    <a href="{{ r.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">Voir</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">Désolé, aucun produit n'a été trouvé pour cette recherche.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<footer class="text-center mt-5 py-3 text-muted">
+    <small>Projet de test - Web Scraping 2026</small>
+</footer>
+
+</body>
+</html>
