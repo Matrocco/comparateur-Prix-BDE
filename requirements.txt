@@ -3,3 +3,4 @@ uvicorn[standard]
 playwright
 jinja2
 python-multipart
+playwright-stealth
