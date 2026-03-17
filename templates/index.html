@@ -1,82 +1,129 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BDE-Prime - Comparateur</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f8f9fa; }
-        .search-container { margin-top: 50px; margin-bottom: 30px; }
-        .card { border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .price-tag { font-size: 1.2rem; font-weight: bold; color: #198754; }
-        .badge-auchan { background-color: #e1001a; }
-        .badge-carrefour { background-color: #003087; }
-        .badge-inter { background-color: #000000; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BDE-Prime — Comparateur de Prix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-
+ 
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+ 
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    BDE-Prime
+  </div>
+  <span class="badge-new">Bêta 2026</span>
+</header>
+ 
 <div class="container">
-    <div class="row justify-content-center search-container">
-        <div class="col-md-8 text-center">
-            <h1 class="display-5 mb-4">BDE-Prime</h1>
-            <p class="text-muted">Comparez Auchan, Carrefour et Intermarché en un clic.</p>
-            
-            <form action="/chercher" method="post" class="input-group input-group-lg shadow-sm">
-                <input type="text" name="produit" class="form-control" placeholder="Ex: Kinder Bueno, Pâtes, Lait..." required>
-                <button class="btn btn-primary" type="submit">Comparer</button>
-            </form>
+ 
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">Comparateur intelligent</div>
+    <h1>Le meilleur prix,<br>en un instant.</h1>
+    <p class="hero-sub">Comparez les prix de vos produits du quotidien dans les grandes enseignes près de chez vous.</p>
+ 
+    <div class="search-wrapper">
+      <form action="/chercher" method="post">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" name="produit" placeholder="Ex: Kinder Bueno, Pâtes, Lait…" value="{{ produit_cherche or '' }}" required>
+          <button type="submit">Comparer</button>
         </div>
+      </form>
     </div>
-
-    {% if produit_cherche %}
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card p-4">
-                <h3 class="mb-4">Résultats pour : <span class="text-primary">{{ produit_cherche }}</span></h3>
-                
-                {% if resultats %}
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Enseigne</th>
-                                <th>Produit trouvé</th>
-                                <th class="text-center">Prix</th>
-                                <th class="text-end">Lien</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for r in resultats %}
-                            <tr>
-                                <td>
-                                    <span class="badge rounded-pill badge-{{ r.enseigne|lower }}">
-                                        {{ r.enseigne }}
-                                    </span>
-                                </td>
-                                <td>{{ r.nom }}</td>
-                                <td class="text-center price-tag">{{ r.prix }}</td>
-                                <td class="text-end">
-                                    <a href="{{ r.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">Voir</a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div class="alert alert-warning">Désolé, aucun produit n'a été trouvé pour cette recherche.</div>
-                {% endif %}
-            </div>
+ 
+    <div class="stores-row">
+      <span class="store-chip"><span class="store-dot" style="background:#e1001a"></span> Auchan</span>
+      <span class="store-chip"><span class="store-dot" style="background:#1a5dbd"></span> Carrefour</span>
+      <span class="store-chip"><span class="store-dot" style="background:#2c9e4e"></span> Intermarché</span>
+    </div>
+  </section>
+ 
+  <!-- RESULTS -->
+  {% if produit_cherche %}
+  <section class="results-section">
+ 
+    <div class="results-header">
+      <div class="results-title">Résultats pour <span>"{{ produit_cherche }}"</span></div>
+      {% if resultats %}
+      <span class="results-count">{{ resultats|length }} résultat{{ 's' if resultats|length > 1 }}</span>
+      {% endif %}
+    </div>
+ 
+    {% if resultats %}
+ 
+    {# Trouver le meilleur prix côté Jinja #}
+    {% set best = namespace(price=None, idx=0) %}
+    {% for r in resultats %}
+      {% set p = r.prix | replace('€','') | replace(',','.') | replace(' ','') | float %}
+      {% if best.price is none or p < best.price %}
+        {% set best.price = p %}
+        {% set best.idx = loop.index0 %}
+      {% endif %}
+    {% endfor %}
+ 
+    <!-- Summary bar -->
+    <div class="summary-bar">
+      <div class="summary-item">
+        <span class="summary-label">Plus bas :</span>
+        <span class="summary-value saving">{{ resultats[best.idx].prix }} — {{ resultats[best.idx].enseigne }}</span>
+      </div>
+      <div class="sep"></div>
+      <div class="summary-item">
+        <span class="summary-label">Enseignes comparées :</span>
+        <span class="summary-value">{{ resultats|map(attribute='enseigne')|unique|list|join(', ') }}</span>
+      </div>
+    </div>
+ 
+    <div class="results-grid">
+      {% for r in resultats %}
+      <div class="result-card {% if loop.index0 == best.idx %}best-price{% endif %}">
+ 
+        {% if r.enseigne|lower == 'auchan' %}
+          <div class="store-logo store-auchan">AUC</div>
+        {% elif r.enseigne|lower == 'carrefour' %}
+          <div class="store-logo store-carrefour">CAR</div>
+        {% else %}
+          <div class="store-logo store-intermarche">INT</div>
+        {% endif %}
+ 
+        <div class="card-info">
+          <div class="card-store-name">{{ r.enseigne }}</div>
+          <div class="card-product-name">{{ r.nom }}</div>
         </div>
+ 
+        <div class="card-price">{{ r.prix }}</div>
+ 
+        <a href="{{ r.url }}" target="_blank" rel="noopener" class="card-link" title="Voir sur le site">↗</a>
+      </div>
+      {% endfor %}
+    </div>
+ 
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">🔎</div>
+      <div class="empty-title">Aucun résultat trouvé</div>
+      <p class="empty-text">Essayez un autre nom de produit ou vérifiez l'orthographe.</p>
     </div>
     {% endif %}
+ 
+  </section>
+  {% endif %}
+ 
 </div>
-
-<footer class="text-center mt-5 py-3 text-muted">
-    <small>Projet de test - Web Scraping 2026</small>
+ 
+<footer>
+  <small>BDE-Prime &nbsp;·&nbsp; Projet Web Scraping 2026 &nbsp;·&nbsp; Association étudiante</small>
 </footer>
-
+ 
 </body>
 </html>
+ 

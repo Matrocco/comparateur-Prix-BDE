@@ -12,8 +12,9 @@ from scrapers.auchan import scrape_auchan
 app = FastAPI()
 
 # Configuration des fichiers statiques et des templates HTML
-# app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
+
 
 @app.get("/")
 async def home(request: Request):
